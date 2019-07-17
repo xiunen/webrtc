@@ -1,22 +1,24 @@
 import React, { PureComponent } from 'react';
-// import PropTypes from 'prop-types';
-// import cssModules from 'react-css-modules';
 
-// import style from './style.css';
 const configuration = {
+  // iceTransports: "relay",
   iceServers: [
+    {
+      urls: 'stun:stun.stunprotocol.org:3478'
+    },
     {
       urls: 'stun:stun.l.google.com:19302'
     },
-    // {
-    //   urls: 'stun:stun.stunprotocol.org:3478'
-    // },
   ]
 }
 
+const optionalRtpDataChannels = {
+  optional: [{
+    RtpDataChannels: true
+  }]
+};
+
 class App extends PureComponent {
-  // static propTypes = {
-  // }
 
   state = {
     fields: { name: '' },
@@ -26,23 +28,22 @@ class App extends PureComponent {
     callings: [],
     name: "",
     messages: [],
+    toConnect: null,
     connecting: null,
-    connected: false
+    connected: true
   }
 
-  connection = new RTCPeerConnection()
 
   componentDidMount() {
     this.inter = setInterval(() => {
       this.getUserList();
       this.getCallingList();
       this.getAnswers();
-
-      // console.log(this.dataChannel)
+      this.getCandidates()
     }, 3000)
 
-    this.createDataChannel()
-    this.initEventListener()
+    // this.createDataChannel()
+    // this.initEventListener()
   }
 
   componentWillUnmount() {
@@ -50,8 +51,92 @@ class App extends PureComponent {
     this.disconnectUser()
   }
 
+  createConnection() {
+    this.connection = new RTCPeerConnection(configuration, optionalRtpDataChannels)
+    // if (label === 'from') {
+    this.createDataChannel()
+    // } else {
+    this.listenDataChannel()
+    // }
+    this.initEventListener()
+  }
+
+  listenDataChannel = () => {
+    this.connection.ondatachannel = (e) => {
+      console.log('ondatachannel', e)
+      const recieveChannel = e.channel
+      recieveChannel.onmessage = (...args) => {
+        console.log('ondatachannel onmessage ', ...args)
+      }
+      recieveChannel.onopen = (...args) => {
+        console.log('ondatachannel onopen ', ...args)
+      }
+      recieveChannel.onclose = (...args) => {
+        console.log('ondatachannel onclose ', ...args)
+      }
+    }
+  }
+
+  initEventListener = () => {
+    const { inited } = this.state
+
+    if (inited) return;
+
+    console.log('listen')
+
+    this.connection.onconnection = (...args) => {
+      console.log('onconnection', ...args)
+    }
+
+    this.connection.onicecandidate = (e) => {
+      console.log('onicecandidate', e)
+      // if (!(this.connection.remoteDescription)) return;
+      if (e.candidate) {
+        const to = this.state.toConnect || this.state.connecting
+        console.log('addIceCandidate', to)
+        // if (this.side === 'from') {
+        fetch('/candidates', {
+          method: 'POST',
+          body: JSON.stringify({
+            to,
+            from: this.state.name,
+            candidate: e.candidate
+          }),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).catch(e => {
+          console.error('post candidate', e)
+        })
+        // this.connection.addIceCandidate(e.candidate)
+        // }
+      }
+    }
+
+    this.connection.onconnectionstatechange = e => {
+      console.log("Connection state change: " + this.connection.connectionState, e)
+    };
+    this.connection.onnegotiationneeded = e => {
+      console.log("Negotiation needed: ", e);
+    };
+    this.connection.onicecandidateerror = e => {
+      console.log("ICE candidate error: " + e);
+    }
+    this.connection.oniceconnectionstatechange = e => {
+      console.log("ICE connection state change: " + this.connection.iceConnectionState, e);
+    }
+    this.connection.onicegatheringstatechange = e => {
+      console.log("ICE gathering state change: " + this.connection.iceGatheringState, e);
+    }
+    this.connection.onsignalingstatechange = e => {
+      console.log("Signaling state change: " + this.connection.signalingState, e);
+    }
+
+    this.setState({ inited: true })
+  }
+
   createDataChannel = () => {
-    this.dataChannel = this.connection.createDataChannel('sendChannel')
+    this.dataChannel = this.connection.createDataChannel('sendChannel-' + this.side)
 
     this.dataChannel.onopen = (...args) => {
       console.log('datachannel open', ...args)
@@ -68,47 +153,6 @@ class App extends PureComponent {
     this.dataChannel.onmessage = (...args) => {
       console.log('datachannel message', ...args)
     }
-  }
-
-  initEventListener = () => {
-    const { inited } = this.state
-
-    if (inited) return;
-
-    console.log('listen')
-
-    this.connection.onconnection = (...args) => {
-      console.log('onconnection', ...args)
-    }
-
-    this.connection.onnegotiationneeded = (...args) => {
-      console.log('onnegotiationneeded', ...args)
-    }
-
-    this.connection.ondatachannel = (e) => {
-      console.log('ondatachannel', e)
-      const recieveChannel = e.channel
-      recieveChannel.onmessage = (...args) => {
-        console.log('ondatachannel onmessage ', ...args)
-      }
-      recieveChannel.onopen = (...args) => {
-        console.log('ondatachannel onopen ', ...args)
-      }
-      recieveChannel.onclose = (...args) => {
-        console.log('ondatachannel onclose ', ...args)
-      }
-    }
-
-    this.connection.onicecandidate = (e) => {
-      if (!(this.connection.remoteDescription)) return;
-      // console.log(this.connection)
-      if (e.candidate) {
-        this.connection.addIceCandidate(e.candidate)
-      }
-      console.log('onicecandidate', e)
-    }
-
-    this.setState({ inited: true })
   }
 
 
@@ -178,17 +222,50 @@ class App extends PureComponent {
         console.log('connecting answer', conn.answer)
         this.setState({ connecting: conn.from })
         this.connection.setRemoteDescription(new RTCSessionDescription(conn.answer))
+        this.remoteSet = true
+        this.setCandidates()
       }
     })
 
+  }
+
+  getCandidates = () => {
+    const { name } = this.state
+
+    if (!(name)) return;
+    if (!this.connection) return;
+
+    fetch(`/candidate/${name}`, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(res => res.json()).then(res => {
+      console.log('get candiates', res.length)
+      if (res.length) {
+        this.candidates = res;
+      }
+      this.setCandidates();
+
+    })
+  }
+
+  setCandidates = () => {
+    if (!this.remoteSet) return;
+    (this.candidates || []).forEach(item => {
+      console.log(item)
+      this.connection.addIceCandidate(new RTCIceCandidate(item.candidate))
+    })
+
+    this.candidates = []
   }
 
   sendMsg = () => {
     if (!this.connection) return;
 
     const { name, message } = this.state
-    console.log(name, message)
-    this.dataChannel.send(JSON.stringify({ name, message, timestamp: Date.now() }))
+    const data = JSON.stringify({ name, message, timestamp: Date.now() })
+    console.log(data)
+    this.dataChannel.send(data)
   }
 
   disconnectUser = () => {
@@ -207,10 +284,10 @@ class App extends PureComponent {
   }
 
   connectUser = (user) => {
-    if (!this.connection) return;
-    if (!user) {
-      alert('User offline')
-      return;
+    this.setState({ toConnect: user })
+    if (!this.connection) {
+      this.side = 'from'
+      this.createConnection()
     }
 
     const { connection } = this
@@ -237,14 +314,22 @@ class App extends PureComponent {
   }
 
   answerUser = ({ from, offer }) => {
+    if (!this.connection) {
+      this.side = 'to'
+      this.state.connecting = from
+      this.createConnection()
+    }
     const { connection } = this;
     const { name } = this.state
 
-    console.log('answer offer', offer)
+    console.log('answer offer', connection)
 
     connection.setRemoteDescription(new RTCSessionDescription(offer))
-      .then(() => connection.createAnswer())
-      .then(answer => {
+      .then(() => {
+        this.remoteSet = true
+        this.setCandidates()
+        return connection.createAnswer()
+      }).then(answer => {
         console.log('answer created', answer)
         connection.setLocalDescription(answer)
 
