@@ -1,0 +1,30 @@
+{
+  "name": "webrtc",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:xiunen/webrtc.git",
+  "author": "xiuneng.chen <xiuneng.chen@shopee.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-syntax-async-generators": "^7.2.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "nodemon": "^1.19.1",
+    "parcel": "^1.12.3",
+    "react": "^16.8.6",
+    "react-css-modules": "^4.7.11",
+    "react-dom": "^16.8.6",
+    "websocket": "^1.0.29"
+  },
+  "scripts": {
+    "dev": "NODE_ENV=development node server.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@babel/preset-env": "^7.5.4",
+    "@babel/preset-react": "^7.0.0",
+    "less": "^3.9.0",
+    "parcel-bundler": "^1.12.3"
+  }
+}
