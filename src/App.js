@@ -2,14 +2,14 @@ import React, { PureComponent } from 'react';
 
 const configuration = {
   // iceTransports: "relay",
-  iceServers: [
-    {
-      urls: 'stun:stun.stunprotocol.org:3478'
-    },
-    {
-      urls: 'stun:stun.l.google.com:19302'
-    },
-  ]
+  // iceServers: [
+  //   {
+  //     urls: 'stun:stun.l.google.com:19302'
+  //   },
+  //   {
+  //     urls: 'stun:stun.stunprotocol.org:3478'
+  //   },
+  // ]
 }
 
 const optionalRtpDataChannels = {
@@ -53,18 +53,20 @@ class App extends PureComponent {
 
   createConnection() {
     this.connection = new RTCPeerConnection(configuration, optionalRtpDataChannels)
-    // if (label === 'from') {
-    this.createDataChannel()
-    // } else {
-    this.listenDataChannel()
-    // }
+    if (this.side === 'from') {
+      this.createDataChannel()
+    } else {
+      this.listenDataChannel()
+      }
     this.initEventListener()
   }
 
   listenDataChannel = () => {
+    console.log('listen datachannel')
     this.connection.ondatachannel = (e) => {
       console.log('ondatachannel', e)
       const recieveChannel = e.channel
+      this.dataChannel = recieveChannel
       recieveChannel.onmessage = (...args) => {
         console.log('ondatachannel onmessage ', ...args)
       }
@@ -73,6 +75,9 @@ class App extends PureComponent {
       }
       recieveChannel.onclose = (...args) => {
         console.log('ondatachannel onclose ', ...args)
+      }
+      recieveChannel.onerror = (...args) => {
+        console.log('ondatachannel onerror ', ...args)
       }
     }
   }
@@ -132,11 +137,16 @@ class App extends PureComponent {
       console.log("Signaling state change: " + this.connection.signalingState, e);
     }
 
+    this.connection.onopen = (...args)=>{
+      console.log('connection onopen',...args)
+    }
+
     this.setState({ inited: true })
   }
 
   createDataChannel = () => {
-    this.dataChannel = this.connection.createDataChannel('sendChannel-' + this.side)
+    console.log('create datachannel')
+    this.dataChannel = this.connection.createDataChannel('sendChannel-'+this.side)
 
     this.dataChannel.onopen = (...args) => {
       console.log('datachannel open', ...args)
