@@ -15,16 +15,24 @@
     "react": "^16.8.6",
     "react-css-modules": "^4.7.11",
     "react-dom": "^16.8.6",
-    "websocket": "^1.0.29"
+    "ws": "^7.1.0"
   },
   "scripts": {
-    "dev": "NODE_ENV=development node server.js"
+    "dev": "server && client",
+    "server": "NODE_ENV=development nodemon server",
+    "client": "NODE_ENV=development parcel index.html",
+    "dev:http": "NODE_ENV=development nodemon server/http",
+    "dev:ws": "NODE_ENV=development nodemon server/ws"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",
     "@babel/preset-env": "^7.5.4",
     "@babel/preset-react": "^7.0.0",
+    "autoprefixer": "^9.6.1",
     "less": "^3.9.0",
-    "parcel-bundler": "^1.12.3"
+    "parcel-bundler": "^1.12.3",
+    "postcss-modules": "^1.4.1",
+    "react-redux": "^7.1.0",
+    "redux": "^4.0.4"
   }
 }

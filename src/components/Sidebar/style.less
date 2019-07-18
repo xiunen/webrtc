@@ -1,0 +1,50 @@
+.userlist {
+  width: 280px;
+  min-width: 280px;
+  height: 100%;
+  background: #2e3238;
+  color: white;
+  position: relative;
+
+  header {
+    font-size: 20px;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  footer {
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+    cursor: pointer;
+    border-top: 1px solid #3b3b3b;
+  }
+}
+
+.friends {
+
+  >li {
+    padding: 10px 20px;
+    border-top: 1px solid #3b3b3b;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+
+    &:nth-child(odd) {
+      background: rgba(54, 57, 62, 0.9) // opacity: 0.95;
+    }
+
+    &.active {
+      background: #3a3f45;
+    }
+
+  }
+}
+
+.friendscontainer {
+  max-height: 450px;
+  overflow-y: auto;
+}
