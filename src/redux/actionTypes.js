@@ -16,3 +16,8 @@ export const RTC_CONNECTING = 'rtc connecting'
 export const RTC_CONNECTED = 'rtc connected'
 
 export const RTC_DISCONNECTED = 'rtc disconnected'
+
+export const RTC_CANDIDATE = 'rtc candidate'
+export const RTC_RESET_CANDIDATE = 'reset rtc candidate'
+
+export const USER_MSG = 'user msg'

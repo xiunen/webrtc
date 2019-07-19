@@ -17,12 +17,16 @@ const sendMsg = (socket, msg) => {
   socket.send(result)
 }
 
-const checkUser = (user) => {
-  return !!sockets[user]
+const checkUser = (userId) => {
+  return !!sockets[userId]
 }
 
 const saveUser = (name, socket) => {
   sockets[name] = socket;
+}
+
+const getFriends = () => {
+  return Object.keys(sockets).map(id => ({ id, name: id }))
 }
 
 const actions = {
@@ -34,54 +38,53 @@ const actions = {
     }
 
     saveUser(name, socket)
-    sendMsg(socket, { action: 'login', success: true, message: `${name} login success`, name })
+    sendMsg(socket, { action: 'login', success: true, message: `${name} login success`, user: { id: name } })
 
     broadcast({
       action: 'friends',
-      message: `${name} join!`,
-      data: Object.keys(sockets)
+      message: `User: ${name} join!`,
+      data: getFriends()
     })
   },
 
   //登出
   logout(socket) {
     console.log('logut')
-    const [user] = Object.entries(sockets).find(item => item[1] === socket) || {}
-
-    broadcast({
-      action: 'friends',
-      message: `${user} leave!`,
-      data: Object.keys(sockets)
-    })
+    const [user] = Object.entries(sockets).find(item => item[1] === socket) || []
 
     if (user) {
       delete sockets[user]
+      broadcast({
+        action: 'friends',
+        message: `User: ${user} leave!`,
+        data: getFriends()
+      })
     }
   },
 
   //呼叫
-  call(socket, data) {
-    const { name, desc, creator } = data
+  callout(socket, data) {
+    const { user, desc, creator } = data
 
-    if (!checkUser(name)) {
-      return sendMsg(socket, { action: 'call', success: false, to, message: `Calling user: ${name} does not exist!` })
+    if (!checkUser(user.id)) {
+      return sendMsg(socket, { action: 'callout', success: false, message: `Calling user: [${user.name}] does not exist!` })
     }
 
-    sendMsg(sockets[name], {
-      action: 'call', success: true, desc, name: creator, message: `User: ${creator} is calling you!`
+    sendMsg(sockets[user.id], {
+      action: 'callout', success: true, desc, user: creator, message: `User: [${creator.name}] is calling you!`
     })
   },
 
   //回答
   answer(socket, data) {
-    const { name, desc, creator } = data
+    const { user, desc, creator } = data
 
-    if (!checkUser(name)) {
-      return sendMsg(socket, { action: 'answer', success: false, to, message: `Answering user: ${name} does not exist` })
+    if (!checkUser(user.id)) {
+      return sendMsg(socket, { action: 'answer', success: false, user, message: `Answering user: [${user.name}] does not exist` })
     }
 
-    sendMsg(sockets[name], {
-      action: 'answer', success: true, desc, name: creator, message: `User: ${creator} answered`
+    sendMsg(sockets[user.id], {
+      action: 'answer', success: true, desc, user: creator, message: `User: [${creator.name}] answered`
     })
   },
 
@@ -94,20 +97,20 @@ const actions = {
     }
 
     sendMsg(sockets[name], {
-      action: 'hangup', success: true, desc, message: `User: ${creator} is hanging up!`
+      action: 'hangup', success: true, desc, user: { id: creator }, message: `User: ${creator} is hanging up!`
     })
   },
 
   //交换candiate
   candidate(socket, data) {
-    const { name, desc, creator } = data
+    const { user, desc, creator } = data
 
-    if (!checkUser(name)) {
-      return sendMsg(socket, { action: 'candidate', success: false, to, message: `Candidate: ${name} not exist` })
+    if (!checkUser(user.id)) {
+      return sendMsg(socket, { action: 'candidate', success: false, user, message: `Candidate: [${user.name}] not exist` })
     }
 
-    sendMsg(sockets[name], {
-      action: 'candidate', success: true, desc, message: `receive candidate from: ${creator}`
+    sendMsg(sockets[user.id], {
+      action: 'candidate', success: true, desc, user: creator, message: `receive candidate from: [${creator.name}]`
     })
   }
 

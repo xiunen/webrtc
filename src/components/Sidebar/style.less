@@ -10,6 +10,7 @@
     font-size: 20px;
     padding: 40px 20px;
     text-align: center;
+    font-weight: 600;
   }
 
   footer {
@@ -32,6 +33,7 @@
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
     &:nth-child(odd) {
       background: rgba(54, 57, 62, 0.9) // opacity: 0.95;
@@ -47,4 +49,21 @@
 .friendscontainer {
   max-height: 450px;
   overflow-y: auto;
+}
+
+.done,
+.doing {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+}
+
+.done {
+  background-color: rgb(82, 196, 26);
+}
+
+.doing {
+  background-color: #ee4d2d;
 }

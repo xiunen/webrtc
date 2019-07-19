@@ -8,6 +8,50 @@
   top: 50%;
   transform: translateX(-50%) translateY(-50%);
   background: #fff;
-
+  // box-shadow: 0 0 5px rgba(239, 77, 35, 0.4);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.6);
   display: flex;
+}
+
+.body {
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.no-body {
+  text-align: center;
+  font-size: 24px;
+  color: #ccc;
+  margin-top: 280px;
+  height: 100%;
+  width: 100%;
+}
+
+
+.full {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ee4d2d;
+  font-size: 20px;
+
+  >*:first-child {
+    margin-top: -100px;
+  }
+
+  button {
+    width: 200px;
+    min-height: 40px;
+    margin-top: -100px;
+  }
 }
