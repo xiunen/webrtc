@@ -2,7 +2,8 @@ import * as actionTypes from '../actionTypes'
 import { RTC_STATUS } from '../../constants'
 
 export default (state = {}, action) => {
-  const { payload = {} } = action
+  const { payload } = action
+  if(!payload)return state;
   const { user, ...rest } = payload
   if (!user) return state;
   const userData = state[user.id] || {}

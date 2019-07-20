@@ -32,7 +32,7 @@ class App extends PureComponent {
         sessionStorage.setItem('user', id)
       }
     } else if (res.action === 'friends') {
-      const { selectedUser } = this.props
+      const { selectedUser ={}} = this.props
       store.dispatch({ type: actionTypes.SET_FRIENDS, payload: res.data })
       if (!res.data.find(item => item.id === selectedUser.id)) {
         store.dispatch({ type: actionTypes.SELECT_USER, payload: null })
@@ -87,5 +87,5 @@ class App extends PureComponent {
 
 export default connect(state => ({
   currentUser: state.currentUser,
-  selectedUser: state.selectedUser
+  selectedUser: state.selectedUser||undefined
 }))(cssModules(App, style, { allowMultiple: true, handleNotFoundStyleName: 'ignore' }));

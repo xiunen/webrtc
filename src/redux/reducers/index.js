@@ -36,19 +36,23 @@ export default (extraReducers = {}) => combineReducers({
   },
   messages: (state = {}, action) => {
     if (action.type === actionTypes.USER_MSG) {
-      const { user, msg, from } = action.payload
+      const { user, from, ...rest } = action.payload
       const msgs = state[user.id] || []
       return {
         ...state,
         [user.id]: [
           ...msgs,
           {
-            from, msg, time: Date.now()
+            from, time: Date.now(), ...rest
           }
         ]
       }
     }
     return state;
+  },
+
+  videos:{
+    local: null,
   }
 
 })

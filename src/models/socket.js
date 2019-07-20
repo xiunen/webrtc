@@ -23,7 +23,7 @@ class Socket {
       this.handle = handle
     }
     this.instance.onmessage = (msg) => {
-      try {
+      // try {
         const data = JSON.parse(msg.data)
 
         if (data.message) {
@@ -31,9 +31,9 @@ class Socket {
         }
 
         this.handle && this.handle(data)
-      } catch (e) {
-        this.log(e.message)
-      }
+      // } catch (e) {
+        // this.log(e.message)
+      // }
     }
   }
 

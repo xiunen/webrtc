@@ -44,6 +44,11 @@ export default class RTC {
           type: actionTypes.RTC_CONNECTED,
           payload: { user: this.user }
         })
+      }else if (this.connection.connectionState === 'disconnected') {
+        store.dispatch({
+          type: actionTypes.RTC_DISCONNECTED,
+          payload:{user:this.user}
+        })
       }
     };
     this.connection.onnegotiationneeded = e => {
@@ -80,18 +85,40 @@ export default class RTC {
       this.log('datachannel message', ...args)
     }
 
+    const self = this
+
     this.connection.ondatachannel = (e) => {
       this.log('create datachannel', e)
       const recieveChannel = e.channel
       recieveChannel.onmessage = (e) => {
-        store.dispatch({
-          type: actionTypes.USER_MSG,
-          payload: {
-            msg: e.data,
-            from: this.user,
-            user: this.user,
+        let result = {};
+        if(typeof e.data === 'string'){
+          try{
+            result = JSON.parse(e.data)
+          }catch(e){
+
           }
-        })
+        }else{
+          //可以处理文件分片
+          result = {
+            ...this.fileInfo,
+            data:e.data,
+            done: true
+          }
+        }
+
+        if(result.type === 'file' && !result.done){
+          this.fileInfo = result
+        }else{
+          store.dispatch({
+            type: actionTypes.USER_MSG,
+            payload: {
+              from: this.user,
+              user: this.user,
+              ...result,
+            }
+          })
+        }
       }
       recieveChannel.onopen = (...args) => {
         this.log('datachannel onopen ', ...args)
@@ -159,12 +186,12 @@ export default class RTC {
     this.log(`add candidate from user: ${this.user.name}`)
   }
 
-  send(msg) {
+  send(obj={}) {
     const { currentUser } = store.getState()
     store.dispatch({
       type: actionTypes.USER_MSG,
       payload: {
-        msg,
+        ...obj,
         user: this.user,
         from: currentUser
       }
@@ -172,7 +199,40 @@ export default class RTC {
   }
 
   sendText(msg) {
-    this.dataChannel.send(msg)
-    this.send(msg)
+    this.dataChannel.send(JSON.stringify({type:'text',msg}))
+    this.send({type:'text',msg})
   }
+
+  sendFile(file){
+    this.send({type:'file', msg: file})
+    const fileReader = new FileReader()
+    //大文件分片传输
+    this.dataChannel.send(JSON.stringify({
+      type:'file',
+      msg:{
+        name: file.name, 
+        size: file.size,
+      }
+    }))
+
+    fileReader.onload = ()=>{
+      // const blob = new Blob([fileReader.result])
+      this.dataChannel.send(fileReader.result)
+    }
+    fileReader.readAsArrayBuffer(file)
+  }
+  sendImage(file){
+    const fileReader = new FileReader()
+    fileReader.onload = ()=>{
+      const data = {
+        type:'image',
+        msg:fileReader.result
+      }
+      this.dataChannel.send(JSON.stringify(data))
+    this.send(data)
+  }
+    fileReader.readAsDataURL(file)
+  }
+
+  addStream(stream){}
 }

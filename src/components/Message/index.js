@@ -11,11 +11,45 @@ class Message extends PureComponent {
     currentUser: PropTypes.object
   }
 
+  renderContent(item){
+    const {currentUser} = this.props
+    
+    if(item.type === 'file'){
+      const blob = new Blob([item.data])
+      const url = URL.createObjectURL(blob)
+      if(item.from.id===currentUser.id)return `[FILE]: ${item.msg.name}`
+      return (
+        <div>
+          <div>[FILE]: {item.msg.name}</div>
+          <div>
+            <a href={url} download={item.msg.name}>Download</a>
+          </div>
+        </div>
+      );
+    }
+
+    if(item.type === 'image'){
+      return (
+        <img src={item.msg} className={style.img}/>
+      )
+    }
+
+    
+
+    return item.msg
+  }
+
+  componentDidUpdate(){
+    if(this.wrapper){
+      this.wrapper.scrollTo(0, this.wrapper.scrollTop)
+    }
+  }
+
   render() {
     const { messages, currentUser } = this.props;
 
     return (
-      <div className={style.container}>
+      <div className={style.container} ref={c=>{this.wrapper=c}}>
         <ul>
           {messages.map(item => (
             <li key={item.time + '-' + item.from.id}
@@ -25,7 +59,7 @@ class Message extends PureComponent {
                 <time>{(new Date(item.time)).toLocaleString()}</time>
               </div>
               <div className={style.msg}>
-                {item.msg}
+                {this.renderContent(item)}
               </div>
             </li>
           ))}

@@ -21,3 +21,9 @@ export const RTC_CANDIDATE = 'rtc candidate'
 export const RTC_RESET_CANDIDATE = 'reset rtc candidate'
 
 export const USER_MSG = 'user msg'
+
+export const ADD_LOCAL_VIDEO = 'locale video'
+export const REMOVE_LOCAL_VIDEO = 'locale video'
+
+export const ADD_REMOTE_VIDEO = 'add remote video'
+export const REOVE_REMOTE_VIDEO = 'remove remote video'

@@ -13,7 +13,7 @@ class Panel extends PureComponent {
   }
 
   state = {
-    open: true,
+    open: false,
     maxHeight: null
   }
 
