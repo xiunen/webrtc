@@ -38,11 +38,20 @@ class Toolbar extends PureComponent {
     }
   }
   handleVideo=(e)=>{
+    const {connection} = this.props;
+    if(!connection){
+      return ;
+    }
+
     this.setState({videoing: true})
     navigator.mediaDevices.getUserMedia({
       audio:true,
       video:true
-    }).then().catch(e=>{
+    }).then(stream=>{
+      console.log('success')
+      connection.rtc.callVideo(stream)
+    }).catch(e=>{
+       console.log('fail',e)
       this.setState({videoing: false})
     })
   }
@@ -52,14 +61,14 @@ class Toolbar extends PureComponent {
       <div className={style.container}>
         <label htmlFor='file-input'>
           <input id='file-input' onChange={this.handleFile} type='file' key={this.state.fid}/>
-          <span>传文件</span>
+          <span>File</span>
         </label>
         <label htmlFor='image-input'>
           <input accept="image/*" id='image-input' onChange={this.handleImage} type='file' key={this.state.pid}/>
-          <span>发图片</span>
+          <span>Image</span>
         </label>
         <label htmlFor='video-btn'>
-          <button id='video-btn' disabled={this.state.videoing} onClick={this.handleVideo}>视频</button>
+          <button id='video-btn' disabled={this.state.videoing} onClick={this.handleVideo}>Video</button>
         </label>
       </div>
     );

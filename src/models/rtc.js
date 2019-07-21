@@ -11,6 +11,7 @@ export default class RTC {
       this.bindListener()
       this.dataChannel = this.connection.createDataChannel(`channel-${user.id}`)
       this.bindDataChannelListener()
+      this.bindStreamListener()
       this.user = user
     }
   }
@@ -132,6 +133,17 @@ export default class RTC {
     }
   }
 
+  bindStreamListener(){
+    this.connection.onaddstream = (obj)=>{
+      console.log('onaddstream',obj)
+
+      store.dispatch({
+        type: actionTypes.ADD_REMOTE_VIDEO,
+        payload: obj.stream
+      })
+    }
+  }
+
   callout(user) {
     this.createConnection(user)
     this.connection.createOffer().then(offer => {
@@ -234,5 +246,14 @@ export default class RTC {
     fileReader.readAsDataURL(file)
   }
 
-  addStream(stream){}
+  callVideo(stream){
+    console.log('callvideo')
+    this.dataChannel.send({type:'video',msg:'call'})
+    this.connection.addStream(stream);
+
+    store.dispatch({
+      type: actionTypes.ADD_LOCAL_VIDEO,
+      payload: stream
+    })
+  }
 }

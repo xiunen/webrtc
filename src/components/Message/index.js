@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import cssModules from 'react-css-modules';
 import { connect } from 'react-redux';
 
+import Video from '../Video'
+
 import style from './style.less';
 
 class Message extends PureComponent {
@@ -64,6 +66,7 @@ class Message extends PureComponent {
             </li>
           ))}
         </ul>
+        <div className={style.video}><Video/></div>
       </div>
     );
   }

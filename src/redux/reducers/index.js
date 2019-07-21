@@ -51,8 +51,22 @@ export default (extraReducers = {}) => combineReducers({
     return state;
   },
 
-  videos:{
-    local: null,
+  videos:(state={}, action)=>{
+    switch(action.type){
+      case actionTypes.ADD_LOCAL_VIDEO:{
+        return {
+          ...state,
+          local: action.payload
+        }
+      }
+      case actionTypes.ADD_REMOTE_VIDEO:{
+        return {
+          ...state,
+          local: action.payload
+        }
+      }
+    }
+    return state;
   }
 
 })
