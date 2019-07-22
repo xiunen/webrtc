@@ -42,8 +42,13 @@ class Host extends PureComponent {
     })
   }
 
+  // sendStream=()=>{
+  //   Object.keys(this.connections).map(key=>{
+  //     this.connections[key].addStream(this.stream)
+  //   })
+  // }
+
   listen = (data) => {
-    console.log(data)
     if (data.action === 'join') {
       const peer = new RTCPeerConnection()
       decorator(peer)
@@ -126,7 +131,6 @@ class Host extends PureComponent {
   }
 
   render() {
-    console.log(1111)
     const { roomId, active } = this.state
     const url = `${location.protocol}//${location.host}/audience.html?room=${roomId}`
     return (
@@ -137,7 +141,8 @@ class Host extends PureComponent {
               <video ref={c => { this.video = c }} autoPlay />
             </div>
             <div>
-              {url}
+              {url} 
+              {/* <button onClick={this.sendStream}>推流</button> */}
             </div>
           </div>
         ) : <div>

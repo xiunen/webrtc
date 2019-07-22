@@ -65,7 +65,6 @@ class Audience extends PureComponent {
   }
 
   listen = (data) => {
-    console.log(111, data)
     if (data.action === 'call') {
       this.peer.setRemoteDescription(new RTCSessionDescription(data.desc))
         .then(() => this.peer.createAnswer())
