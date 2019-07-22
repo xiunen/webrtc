@@ -29,7 +29,6 @@ class Login extends PureComponent {
 
   render() {
     const { name } = this.state
-
     return (
       <Panel className={style.container}>
         <header className={style.header}>Sign In</header>

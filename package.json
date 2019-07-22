@@ -22,7 +22,9 @@
     "server": "NODE_ENV=development nodemon server",
     "client": "NODE_ENV=development parcel index.html",
     "dev:http": "NODE_ENV=development nodemon server/http",
-    "dev:ws": "NODE_ENV=development nodemon server/ws"
+    "dev:ws": "NODE_ENV=development nodemon server/ws",
+    "share-server": "NODE_ENV=development nodemon server/share",
+    "share-client": "NODE_ENV=development parcel ./host.html ./audience.html --port 1235"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-0",

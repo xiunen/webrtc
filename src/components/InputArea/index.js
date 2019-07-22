@@ -16,15 +16,20 @@ class InputArea extends PureComponent {
 
   send = () => {
     const { value } = this.state
+    if (!value) return;
     const { connection } = this.props;
     connection.rtc.sendText(value)
     this.setState({ value: '' })
   }
 
-  handleKeyUp = (e) => {
+  handlePressEnter = (e) => {
     if (e.which === 13 || e.keyCode === 13) {
       this.send()
     }
+  }
+
+  changeInput = e => {
+    this.setState({ value: e.target.value.trim() })
   }
 
   render() {
@@ -33,9 +38,9 @@ class InputArea extends PureComponent {
     return (
       <div className={style.container} >
         <div>
-          <textarea value={value} onChange={e => this.setState({ value: e.target.value })}
+          <textarea value={value} onChange={this.changeInput}
             resize='off' ref={c => { this.input = c }} autoFocus style={{ fontSize: 16 }}
-            onKeyUp={this.handleKeyUp}
+            onKeyDown={this.handlePressEnter}
           />
         </div>
         <div className={style['action-container']}>
