@@ -13,13 +13,13 @@ class Message extends PureComponent {
     currentUser: PropTypes.object
   }
 
-  renderContent(item){
-    const {currentUser} = this.props
-    
-    if(item.type === 'file'){
+  renderContent(item) {
+    const { currentUser } = this.props
+
+    if (item.type === 'file') {
       const blob = new Blob([item.data])
       const url = URL.createObjectURL(blob)
-      if(item.from.id===currentUser.id)return `[FILE]: ${item.msg.name}`
+      if (item.from.id === currentUser.id) return `[FILE]: ${item.msg.name}`
       return (
         <div>
           <div>[FILE]: {item.msg.name}</div>
@@ -30,19 +30,19 @@ class Message extends PureComponent {
       );
     }
 
-    if(item.type === 'image'){
+    if (item.type === 'image') {
       return (
-        <img src={item.msg} className={style.img}/>
+        <img src={item.msg} className={style.img} />
       )
     }
 
-    
+
 
     return item.msg
   }
 
-  componentDidUpdate(){
-    if(this.wrapper){
+  componentDidUpdate() {
+    if (this.wrapper) {
       this.wrapper.scrollTo(0, this.wrapper.scrollTop)
     }
   }
@@ -51,7 +51,7 @@ class Message extends PureComponent {
     const { messages, currentUser } = this.props;
 
     return (
-      <div className={style.container} ref={c=>{this.wrapper=c}}>
+      <div className={style.container} ref={c => { this.wrapper = c }}>
         <ul>
           {messages.map(item => (
             <li key={item.time + '-' + item.from.id}
@@ -66,7 +66,6 @@ class Message extends PureComponent {
             </li>
           ))}
         </ul>
-        <div className={style.video}><Video/></div>
       </div>
     );
   }

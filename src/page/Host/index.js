@@ -38,7 +38,7 @@ class Host extends PureComponent {
         this.video.srcObject = this.stream
       })
     }).catch(e => {
-      console.log(e)
+      console.error(e)
     })
   }
 
@@ -141,7 +141,7 @@ class Host extends PureComponent {
               <video ref={c => { this.video = c }} autoPlay />
             </div>
             <div>
-              {url} 
+              {url}
               {/* <button onClick={this.sendStream}>推流</button> */}
             </div>
           </div>
