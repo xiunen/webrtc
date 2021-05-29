@@ -15,7 +15,7 @@
     "react": "^16.8.6",
     "react-css-modules": "^4.7.11",
     "react-dom": "^16.8.6",
-    "ws": "^7.1.0"
+    "ws": "^7.4.6"
   },
   "scripts": {
     "dev": "server && client",
